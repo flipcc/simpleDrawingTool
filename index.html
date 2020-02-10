@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h1>Simple drawing tool</h1>
+  <div id="canvasRoot"></div>
+  <div>
+    <button
+      onclick="document.querySelectorAll('path').forEach(path => path.parentNode.removeChild(path));"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; margin-right: 5em; padding: 0.25em 1em;"
+    >
+      Clear
+    </button>
+    <button
+      onclick="document.querySelector('#hiddenMsg').innerText = 'Ein erstes Feature, das du implementieren könntest.';"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+    >
+      &#x2190; Undo
+    </button>
+    <button
+      onclick="document.querySelector('#hiddenMsg').innerText = 'Und dies hier auch noch.';"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+    >
+      Redo &#x2192;
+    </button>
+  </div>
+  <div id="hiddenMsg" style="margin: 10px 0;"></div>
+  <div>
+    <button
+      onclick="exportToInkscape();"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+    >
+      Export &#x2193;
+    </button>
+  </div>
+  <script>
+    /*
+     * PREPARATION
+     */
+    (function createSvgCanvas() {
+      const widthA4 = 210;
+      const heightA4 = 297;
+      // a small dip into getting screen sizes and working with them; never use like this again
+      const canvasRoot = document.querySelector('#canvasRoot');
+      const width =
+        document.body.clientWidth < 500 ? document.body.clientWidth : 500;
+      const height = (width / widthA4) * heightA4;
+      let svgCanvas = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg'
+      );
+      let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+      svgCanvas.setAttribute('id', 'svgCanvas');
+      svgCanvas.setAttribute('width', `${width}`);
+      svgCanvas.setAttribute('height', `${height}`);
+      svgCanvas.setAttribute('viewBox', `0 0 ${widthA4} ${heightA4}`);
+
+      rect.setAttribute('width', `${widthA4}`);
+      rect.setAttribute('height', `${heightA4}`);
+      rect.setAttribute('x', '0');
+      rect.setAttribute('y', '0');
+      rect.setAttribute('fill', 'none');
+      rect.setAttribute('stroke', '#000000');
+      rect.setAttribute('stroke-width', '1px');
+
+      svgCanvas.appendChild(rect);
+      canvasRoot.appendChild(svgCanvas);
+    })(); // the whole "(function() {})();" construct is called an IIFE (Immediately Invoked Function Expression)
+
+    /*
+     * DRAWING LOGIC
+     *
+     * see: https://stackoverflow.com/q/18909142
+     */
+    const svgCanvas = document.querySelector('#svgCanvas');
+    let svgPath = null;
+
+    // on desktop
+    svgCanvas.addEventListener('mousedown', startDrawing, false);
+    svgCanvas.addEventListener('mousemove', continueDrawing, false);
+    svgCanvas.addEventListener('mouseup', stopDrawing, false);
+    document.addEventListener('mouseup', stopDrawing, false);
+    // or on mobile, ...
+    svgCanvas.addEventListener('touchstart', startDrawing, false);
+    svgCanvas.addEventListener('touchmove', continueDrawing, false);
+    svgCanvas.addEventListener('touchend', stopDrawing, false);
+    document.addEventListener('touchend', stopDrawing, false);
+
+    function startDrawing(event) {
+      const point = createPointFromEvent(event);
+
+      svgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      svgPath.setAttribute('fill', 'none');
+      svgPath.setAttribute('stroke', '#000000');
+      svgPath.setAttribute('stroke-width', '1px');
+      svgPath.setAttribute('stroke-linecap', 'butt');
+      svgPath.setAttribute('stroke-linejoin', 'miter');
+      svgPath.setAttribute('stroke-opacity', '1');
+      svgPath.setAttribute('shape-rendering', 'geometricPrecision');
+      svgPath.setAttribute('d', 'M' + point.x + ',' + point.y);
+
+      svgCanvas.appendChild(svgPath);
+    }
+
+    function continueDrawing(event) {
+      if (svgPath !== null) {
+        const point = createPointFromEvent(event);
+        let pathData = svgPath.getAttribute('d');
+
+        pathData = pathData + ' L' + point.x + ',' + point.y;
+
+        svgPath.setAttribute('d', pathData);
+      }
+    }
+
+    function stopDrawing(event) {
+      svgPath = null;
+    }
+
+    function createPointFromEvent(event) {
+      const ctm = event.target.getScreenCTM();
+      let point = svgCanvas.createSVGPoint();
+
+      if (event.type === 'touchmove' || event.type === 'touchstart') {
+        let touch = event.changedTouches[0];
+
+        point.x = touch.clientX;
+        point.y = touch.clientY;
+      } else {
+        point.x = event.clientX;
+        point.y = event.clientY;
+      }
+
+      return point.matrixTransform(ctm.inverse());
+    }
+
+    /*
+     * EXPORT LOGIC
+     */
+    function exportToInkscape() {
+      let element = document.createElement('a');
+      let pathsStr = '';
+      let inkscapeA4TemplateStr = '';
+
+      document
+        .querySelectorAll('path')
+        .forEach((path) => (pathsStr += path.outerHTML));
+      inkscapeA4TemplateStr = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="Zeichnung.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-848.57142"
+     inkscape:cy="560"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    ${pathsStr}
+  </g>
+</svg>`; // just did copy-and-past on an inkscape file
+
+      element.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' +
+          encodeURIComponent(inkscapeA4TemplateStr)
+      );
+      element.setAttribute('download', 'my_beautiful_drawing.svg');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+  </script>
+</body>
