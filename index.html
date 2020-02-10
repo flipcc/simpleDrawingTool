@@ -14,31 +14,29 @@
 </head>
 <body>
   <div id="canvasRoot"></div>
+  <div id="hiddenMsg" style="margin: 10px 0;"></div>
   <div>
     <button
       onclick="document.querySelectorAll('path').forEach(path => path.parentNode.removeChild(path));"
-      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; margin-right: 5em; padding: 0.25em 1em;"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; margin-right: 1.5em; padding: 0.25em 0.5em;"
     >
       Clear
     </button>
     <button
       onclick="document.querySelector('#hiddenMsg').innerText = 'Ein erstes Feature, das du implementieren könntest.';"
-      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 0.5em;"
     >
       &#x2190; Undo
     </button>
     <button
       onclick="document.querySelector('#hiddenMsg').innerText = 'Und dies hier auch noch.';"
-      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; margin-right: 1.5em; padding: 0.25em 0.5em;"
     >
       Redo &#x2192;
     </button>
-  </div>
-  <div id="hiddenMsg" style="margin: 10px 0;"></div>
-  <div>
     <button
       onclick="exportToInkscape();"
-      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 1em;"
+      style="background: transparent; border: 2px solid black; color: black; cursor: pointer; padding: 0.25em 0.5em;"
     >
       Export &#x2193;
     </button>
