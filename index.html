@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>Simple drawing tool 2</h1>
+  <h1>Simple drawing tool 3</h1>
   <div id="canvasRoot"></div>
   <div>
     <button
@@ -52,10 +52,9 @@
       const heightA4 = 297;
       // a small dip into getting screen sizes and working with them; never use like this again
       const canvasRoot = document.querySelector("#canvasRoot");
-      const width = 200;
-      // document.body.clientWidth < 500 ? document.body.clientWidth : 500;
-      const height = 200;
-      // (width / widthA4) * heightA4;
+      const width =
+        document.body.clientWidth < 500 ? document.body.clientWidth : 500;
+      const height = (width / widthA4) * heightA4;
       let svgCanvas = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "svg"
