@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>Simple drawing tool</h1>
+  <h1>Simple drawing tool 2</h1>
   <div id="canvasRoot"></div>
   <div>
     <button
@@ -97,6 +97,10 @@
     svgCanvas.addEventListener("touchmove", continueDrawing, false);
     svgCanvas.addEventListener("touchend", stopDrawing, false);
     document.addEventListener("touchend", stopDrawing, false);
+
+    svgCanvas.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+    });
 
     function startDrawing(event) {
       const point = createPointFromEvent(event);
