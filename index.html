@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html,
+    body {
+      overflow-x: hidden;
+    }
+    body {
+      position: relative;
+    }
+  </style>
 </head>
 <body>
   <h1>Simple drawing tool</h1>
@@ -42,28 +51,28 @@
       const widthA4 = 210;
       const heightA4 = 297;
       // a small dip into getting screen sizes and working with them; never use like this again
-      const canvasRoot = document.querySelector('#canvasRoot');
+      const canvasRoot = document.querySelector("#canvasRoot");
       const width =
         document.body.clientWidth < 500 ? document.body.clientWidth : 500;
       const height = (width / widthA4) * heightA4;
       let svgCanvas = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'svg'
+        "http://www.w3.org/2000/svg",
+        "svg"
       );
-      let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 
-      svgCanvas.setAttribute('id', 'svgCanvas');
-      svgCanvas.setAttribute('width', `${width}`);
-      svgCanvas.setAttribute('height', `${height}`);
-      svgCanvas.setAttribute('viewBox', `0 0 ${widthA4} ${heightA4}`);
+      svgCanvas.setAttribute("id", "svgCanvas");
+      svgCanvas.setAttribute("width", `${width}`);
+      svgCanvas.setAttribute("height", `${height}`);
+      svgCanvas.setAttribute("viewBox", `0 0 ${widthA4} ${heightA4}`);
 
-      rect.setAttribute('width', `${widthA4}`);
-      rect.setAttribute('height', `${heightA4}`);
-      rect.setAttribute('x', '0');
-      rect.setAttribute('y', '0');
-      rect.setAttribute('fill', 'none');
-      rect.setAttribute('stroke', '#000000');
-      rect.setAttribute('stroke-width', '1px');
+      rect.setAttribute("width", `${widthA4}`);
+      rect.setAttribute("height", `${heightA4}`);
+      rect.setAttribute("x", "0");
+      rect.setAttribute("y", "0");
+      rect.setAttribute("fill", "none");
+      rect.setAttribute("stroke", "#000000");
+      rect.setAttribute("stroke-width", "1px");
 
       svgCanvas.appendChild(rect);
       canvasRoot.appendChild(svgCanvas);
@@ -74,32 +83,32 @@
      *
      * see: https://stackoverflow.com/q/18909142
      */
-    const svgCanvas = document.querySelector('#svgCanvas');
+    const svgCanvas = document.querySelector("#svgCanvas");
     let svgPath = null;
 
     // on desktop
-    svgCanvas.addEventListener('mousedown', startDrawing, false);
-    svgCanvas.addEventListener('mousemove', continueDrawing, false);
-    svgCanvas.addEventListener('mouseup', stopDrawing, false);
-    document.addEventListener('mouseup', stopDrawing, false);
+    svgCanvas.addEventListener("mousedown", startDrawing, false);
+    svgCanvas.addEventListener("mousemove", continueDrawing, false);
+    svgCanvas.addEventListener("mouseup", stopDrawing, false);
+    document.addEventListener("mouseup", stopDrawing, false);
     // or on mobile, ...
-    svgCanvas.addEventListener('touchstart', startDrawing, false);
-    svgCanvas.addEventListener('touchmove', continueDrawing, false);
-    svgCanvas.addEventListener('touchend', stopDrawing, false);
-    document.addEventListener('touchend', stopDrawing, false);
+    svgCanvas.addEventListener("touchstart", startDrawing, false);
+    svgCanvas.addEventListener("touchmove", continueDrawing, false);
+    svgCanvas.addEventListener("touchend", stopDrawing, false);
+    document.addEventListener("touchend", stopDrawing, false);
 
     function startDrawing(event) {
       const point = createPointFromEvent(event);
 
-      svgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      svgPath.setAttribute('fill', 'none');
-      svgPath.setAttribute('stroke', '#000000');
-      svgPath.setAttribute('stroke-width', '1px');
-      svgPath.setAttribute('stroke-linecap', 'butt');
-      svgPath.setAttribute('stroke-linejoin', 'miter');
-      svgPath.setAttribute('stroke-opacity', '1');
-      svgPath.setAttribute('shape-rendering', 'geometricPrecision');
-      svgPath.setAttribute('d', 'M' + point.x + ',' + point.y);
+      svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      svgPath.setAttribute("fill", "none");
+      svgPath.setAttribute("stroke", "#000000");
+      svgPath.setAttribute("stroke-width", "1px");
+      svgPath.setAttribute("stroke-linecap", "butt");
+      svgPath.setAttribute("stroke-linejoin", "miter");
+      svgPath.setAttribute("stroke-opacity", "1");
+      svgPath.setAttribute("shape-rendering", "geometricPrecision");
+      svgPath.setAttribute("d", "M" + point.x + "," + point.y);
 
       svgCanvas.appendChild(svgPath);
     }
@@ -107,11 +116,11 @@
     function continueDrawing(event) {
       if (svgPath !== null) {
         const point = createPointFromEvent(event);
-        let pathData = svgPath.getAttribute('d');
+        let pathData = svgPath.getAttribute("d");
 
-        pathData = pathData + ' L' + point.x + ',' + point.y;
+        pathData = pathData + " L" + point.x + "," + point.y;
 
-        svgPath.setAttribute('d', pathData);
+        svgPath.setAttribute("d", pathData);
       }
     }
 
@@ -123,7 +132,7 @@
       const ctm = event.target.getScreenCTM();
       let point = svgCanvas.createSVGPoint();
 
-      if (event.type === 'touchmove' || event.type === 'touchstart') {
+      if (event.type === "touchmove" || event.type === "touchstart") {
         let touch = event.changedTouches[0];
 
         point.x = touch.clientX;
@@ -140,13 +149,13 @@
      * EXPORT LOGIC
      */
     function exportToInkscape() {
-      let element = document.createElement('a');
-      let pathsStr = '';
-      let inkscapeA4TemplateStr = '';
+      let element = document.createElement("a");
+      let pathsStr = "";
+      let inkscapeA4TemplateStr = "";
 
       document
-        .querySelectorAll('path')
-        .forEach((path) => (pathsStr += path.outerHTML));
+        .querySelectorAll("path")
+        .forEach(path => (pathsStr += path.outerHTML));
       inkscapeA4TemplateStr = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
@@ -206,12 +215,12 @@
 </svg>`; // just did copy-and-past on an inkscape file
 
       element.setAttribute(
-        'href',
-        'data:text/plain;charset=utf-8,' +
+        "href",
+        "data:text/plain;charset=utf-8," +
           encodeURIComponent(inkscapeA4TemplateStr)
       );
-      element.setAttribute('download', 'my_beautiful_drawing.svg');
-      element.style.display = 'none';
+      element.setAttribute("download", "my_beautiful_drawing.svg");
+      element.style.display = "none";
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
