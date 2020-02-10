@@ -88,7 +88,7 @@
 
     svgCanvas.addEventListener("touchstart", function(e) {
       e.preventDefault();
-    });
+    }); // this prevents scrolling when drawing on mobile
 
     function startDrawing(event) {
       const point = createPointFromEvent(event);
